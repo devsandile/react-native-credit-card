@@ -1,21 +1,39 @@
+/**
+ * Renders @jesspollak interactive credit card component in React Native
+ * @see https://github.com/descomplica/react-credit-card
+ * @see https://github.com/jessepollak/card
+ */
 import Payment from 'payment'
 import React, { Component } from 'react'
 import {
   StyleSheet,
   View,
 } from 'react-native'
-/**
- * Delete this dependency, or naw?
- */
-import images from './card-images.js'
+import cardImages from './cardImages'
 
-/**
- * @todo Set styles for React-Native appropriately
- * @see './card.css'
- * @see './card-types.css'
- * @type {{}}
- */
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  amex: {
+    backgroundColor: '#108168',
+  },
+  container: {},
+  cardContainer: {},
+  logoContainer: {},
+  dankort: {
+    backgroundColor: '#0055C7',
+  },
+  discover: {
+    backgroundColor: '#86B8CF',
+  },
+  mastercard: {
+    backgroundColor: '#0061A8',
+  },
+  unknown: {
+    backgroundColor: 'transparent',
+  },
+  visa: {
+    backgroundColor: '#191278',
+  },
+})
 
 /**
  * Scope previously rendered constants
@@ -186,8 +204,9 @@ class card extends Component {
   }
 
   render() {
-    <View>
-      <View></View>
+    <View style={styles.container}>
+      <View style={styles.cardContainer}>
+      </View>
     </View>
   }
 }
