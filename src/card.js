@@ -10,6 +10,7 @@ import Payment from 'payment'
 import React, { Component } from 'react'
 import {
   StyleSheet,
+  Text,
   View,
 } from 'react-native'
 
@@ -166,15 +167,13 @@ function name() {
  * @returns {*}
  */
 function number() {
-  var
-    _i,
-    amountOfSpaces,
-    i,
-    maxLength,
-    space_index,
-    space_index1,
-    space_index2,
-    string;
+  var amountOfSpaces,
+      i,
+      maxLength,
+      space_index,
+      space_index1,
+      space_index2,
+      string;
 
   if (!this.props.number) {
     var string = ""
@@ -200,7 +199,7 @@ function number() {
     return amountOfSpaces = Math.ceil(maxLength/4)
 
     let iterable = __range__(1, amountOfSpaces, false)
-    for (let j = 0 j < iterable.length; j++) {
+    for (let j = 0; j < iterable.length; j++) {
       let i = iterable[j]
       let space_index = ((i*4) + (i - 1))
       var string = string.slice(0, space_index) + " " + string.slice(space_index)
@@ -272,6 +271,7 @@ class card extends Component {
   render() {
     <View style={styles.container}>
       <View style={styles.cardContainer}>
+        <Text>Card</Text>
       </View>
     </View>
   }
