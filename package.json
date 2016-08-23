@@ -1,7 +1,7 @@
 {
-  "name": "react-credit-card",
-  "version": "0.11.0",
-  "description": "Display credit cards(port of Card by @jessepollak)",
+  "name": "react-native-credit-card",
+  "version": "0.0.1",
+  "description": "Display credit cards(port of react-credit-card by @JohnyDays who ported Card by @jessepollak)",
   "main": "build/card.js",
   "scripts": {
     "test": "node start.js",
@@ -9,27 +9,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/JohnyDays/react-credit-card"
+    "url": "https://github.com/nsarafa/react-native-credit-card"
   },
   "keywords": [
-    "react",
-    "credit",
     "card",
-    "component"
+    "component",
+    "credit",
+    "react",
+    "react-native"
   ],
-  "author": "João Dias",
+  "author": "Nick Sarafa",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/JohnyDays/react-credit-card/issues"
+    "url": "https://github.com/nsarafa/react-native-credit-card/issues"
   },
-  "homepage": "https://github.com/JohnyDays/react-credit-card",
+  "homepage": "https://github.com/nsarafa/react-native-credit-card",
   "devDependencies": {
-    "browserify": "^8.1.3",
-    "coffee-react": "^2.1.2",
-    "watchify": "^2.3.0",
-    "react": "^0.12.2"
+    "react": "15.2.1",
+    "react-native": "0.30.0"
   },
   "dependencies": {
-    "payment": "0.0.5"
+    "payment": "^2.0.3"
   }
 }

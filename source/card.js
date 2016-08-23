@@ -1,9 +1,9 @@
+import Payment from 'payment'
+import React from 'react'
+import images from './card-images.js'
 
-React   = require('react')
-Payment = require('payment')
-images  = require('./card-images.js')
+const validate = Payment.fns
 
-validate = Payment.fns
 module.exports = React.createClass
 
   displayName: 'Card'
