@@ -1,23 +1,68 @@
 import Payment from 'payment'
-import React from 'react'
+import React, { Component } from 'react'
+import {
+  StyleSheet,
+  View,
+} from 'react-native'
 import images from './card-images.js'
+
+const styles = StyleSheet.create({})
 
 const validate = Payment.fns
 
-module.exports = React.createClass
+class card extends Component {
+  constructor(props) {
+    super(props)
+    // this.state = {
+    //   isLoading: false,
+    //   message: '',
+    //   loginForm: {
+    //     deviceId: 2,
+    //     deviceType: Platform.OS
+    //   }
+    // }
+  }
 
-  displayName: 'Card'
+  defaultProps = {
+    cvc: null,
+    expiry: '',
+    expiryAfter: 'valid thru',
+    expiryBefore: 'month/year',
+    focused: null,
+    name: '',
+    number: null,
+    shinyAfterBack: '',
+    type:null,
+  }
 
-  getDefaultProps:->
-    number: null
-    cvc: null
-    name: ''
-    expiry: ''
-    focused: null
-    expiryBefore: 'month/year'
-    expiryAfter: 'valid thru'
-    shinyAfterBack: ''
-    type:null
+  render() {
+    return (
+      <View>
+      </View>
+    )
+  }
+}
+
+export default card
+
+/**
+ * Legacy react-credit-card code
+ * @type {any}
+ */
+// module.exports = React.createClass
+//
+//   displayName: 'Card'
+//
+//   getDefaultProps:->
+//     number: null
+//     cvc: null
+//     name: ''
+//     expiry: ''
+//     focused: null
+//     expiryBefore: 'month/year'
+//     expiryAfter: 'valid thru'
+//     shinyAfterBack: ''
+//     type:null
 
   render:->
     isAmex = @state.type and @state.type.name is "amex"
