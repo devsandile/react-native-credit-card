@@ -4,23 +4,165 @@ import {
   StyleSheet,
   View,
 } from 'react-native'
+/**
+ * Delete this dependency, or naw?
+ */
 import images from './card-images.js'
 
+/**
+ * @todo Set styles for React-Native appropriately
+ * @see './card.css'
+ * @see './card-types.css'
+ * @type {{}}
+ */
 const styles = StyleSheet.create({})
 
+/**
+ * Scope previously rendered constants
+ */
 const validate = Payment.fns
 
+/**
+ * Render initialState in appropriate position
+ */
+const initialState = {
+  type: {
+    length: 16,
+    name: 'unknown',
+  }
+}
+
+/**
+ * @todo figure out why this was set onRender()
+ */
+let isAmex = this.state.type && this.state.type.name === 'amex'
+
+/**
+ * Begin converted CoffeeScript functions
+ * @param name
+ */
+function cvc() {
+  if (this.props.cvc === null) {
+    return "•••"
+  } else {
+    return this.props.cvc.toString().length <= 4 ? this.props.cvc : this.props.cvc.toString().slice(0, 4)
+  }
+}
+
+function expiry() {
+  if (this.props.expiry === "") {
+    return "••/••"
+  } else {
+
+    let expiry = this.props.expiry.toString()
+
+    let expiryMaxLength = 6 // 2 for month and 4 for year
+
+    if (expiry.match(/\//)) {
+      expiry = expiry.replace("/", "")
+    }
+
+    if (!expiry.match(/^[0-9]*$/)) {
+      return "••/••"
+    }
+
+    while (expiry.length < 4) {
+      expiry += "•"
+    }
+
+    expiry = expiry.slice(0, 2) + "/" + expiry.slice(2, expiryMaxLength)
+
+    return expiry
+  }
+}
+
+function getValue(name) {
+  this[name]()
+}
+
+function name() {
+  if (this.props.name === "") {
+    return "FULL NAME"
+  } else {
+    return this.props.name
+  }
+}
+
+function number() {
+  if (!this.props.number) {
+    var string = ""
+  } else {
+    var string = this.props.number.toString()
+  }
+
+  let maxLength = this.state.type.length
+
+  if (string.length > maxLength) { var string = string.slice(0,maxLength) }
+
+  while (string.length < maxLength) {
+    string += "•"
+  }
+
+  if (this.state.type.name === "amex") {
+    var string
+    let space_index1 = 4
+    let space_index2 = 10
+
+    return string = string.substring(0, space_index1) + " " + string.substring(space_index1, space_index2) + " " + string.substring(space_index2)
+  } else {
+    let amountOfSpaces
+    return amountOfSpaces = Math.ceil(maxLength/4)
+
+    let iterable = __range__(1, amountOfSpaces, false)
+    for (let j = 0 j < iterable.length; j++) {
+      let i = iterable[j]
+      let space_index = ((i*4) + (i - 1))
+      var string = string.slice(0, space_index) + " " + string.slice(space_index)
+    }
+  }
+}
+
+function updateType(props) {
+  let type
+  if (!props.number) {
+    return this.setState({
+      type: {
+        name: "unknown", length: 16
+      }
+    })
+  }
+
+  if (type = validate.cardType(props.number)) {
+    if (type === "amex") {
+      return this.setState({
+        type: {
+          name: type, length: 15
+        }
+      })
+    } else {
+      return this.setState({
+        type: {
+          name: type, length: 16
+        }
+      })
+    }
+  }
+
+  return this.setState({
+    type: {
+      length: 16,
+      name: 'unknown',
+    }
+  })
+}
+
+/**
+ * @export card
+ * @description render React-Native component
+ */
 class card extends Component {
   constructor(props) {
     super(props)
-    // this.state = {
-    //   isLoading: false,
-    //   message: '',
-    //   loginForm: {
-    //     deviceId: 2,
-    //     deviceType: Platform.OS
-    //   }
-    // }
   }
 
   defaultProps = {
@@ -35,156 +177,19 @@ class card extends Component {
     type:null,
   }
 
+  componentWillMount() {
+    return this.updateType(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    return this.updateType(nextProps)
+  }
+
   render() {
-    return (
-      <View>
-      </View>
-    )
+    <View>
+      <View></View>
+    </View>
   }
 }
 
 export default card
-
-/**
- * Legacy react-credit-card code
- * @type {any}
- */
-// module.exports = React.createClass
-//
-//   displayName: 'Card'
-//
-//   getDefaultProps:->
-//     number: null
-//     cvc: null
-//     name: ''
-//     expiry: ''
-//     focused: null
-//     expiryBefore: 'month/year'
-//     expiryAfter: 'valid thru'
-//     shinyAfterBack: ''
-//     type:null
-
-  render:->
-    isAmex = @state.type and @state.type.name is "amex"
-    <div className = "#{exp.prefix}__container">
-      <div className = { "#{exp.prefix} " + @typeClassName() + if @props.focused  is "cvc" and not isAmex then " #{exp.prefix}--flipped" else ""} >
-
-        <div className = "#{exp.prefix}__front" >
-          <div className = "#{exp.prefix}__lower">
-            <div className = "#{exp.prefix}__shiny"/>
-            <img
-                 className = {"#{exp.prefix}__logo " + @typeClassName()}
-                 src = {images[if @props.type then @props.type else @state.type.name]}
-            />
-            {if isAmex then <div className = {@displayClassName("cvc_front")}>{@getValue("cvc")}</div>}
-            <div className = {@displayClassName("number")}>{@getValue("number")}</div>
-            <div className = {@displayClassName("name")}  >{@getValue("name")}</div>
-            <div
-              className = {@displayClassName("expiry")}
-              data-before = {@props.expiryBefore}
-              data-after = {@props.expiryAfter}
-                                                          >{@getValue("expiry")}</div>
-          </div>
-        </div>
-
-        <div className = "#{exp.prefix}__back">
-          <div className = "#{exp.prefix}__bar"/>
-          <div className = {@displayClassName("cvc")}>{@getValue("cvc")}</div>
-          <div className = "#{exp.prefix}__shiny" data-after = {@props.shinyAfterBack}/>
-        </div>
-      </div>
-    </div>
-
-  displayClassName:(base)->
-    className = "#{exp.prefix}__" + base + " #{exp.prefix}__display"
-
-    if @props.focused is base
-      className += " #{exp.prefix}--focused"
-
-    return className
-
-  typeClassName:-> "#{exp.prefix}--" + if @props.type then @props.type else @state.type.name
-
-  getValue:(name)-> @[name]()
-
-  componentWillMount:                  -> @updateType(@props)
-  componentWillReceiveProps:(nextProps)-> @updateType(nextProps)
-  getInitialState:          -> type: {name:"unknown", length: 16}
-  updateType:(props)->
-
-    if !props.number
-      return @setState type: name:"unknown", length: 16
-
-    if type = validate.cardType(props.number)
-      if type is "amex"
-        return @setState type: name:type, length: 15
-      else
-        return @setState type: name:type, length: 16
-
-    return @setState type: name:"unknown", length: 16
-
-
-  number:->
-    if !@props.number
-      string = ""
-    else
-      string = @props.number.toString()
-
-    maxLength = @state.type.length
-
-    if string.length > maxLength then string = string.slice(0,maxLength)
-
-    while string.length < maxLength
-      string += "•"
-
-    if @state.type.name is "amex"
-      space_index1 = 4;
-      space_index2 = 10;
-
-      string = string.substring(0, space_index1) + " " + string.substring(space_index1, space_index2) + " " + string.substring(space_index2)
-    else
-      amountOfSpaces = Math.ceil(maxLength/4)
-
-      for i in [1...amountOfSpaces]
-        space_index = (i*4 + (i - 1))
-        string = string.slice(0, space_index) + " " + string.slice(space_index)
-
-    return string
-
-  name:->
-    if @props.name is ""
-      return "FULL NAME"
-    else
-      return @props.name
-
-  expiry:->
-    if @props.expiry is ""
-      return "••/••"
-    else
-
-      expiry = @props.expiry.toString()
-
-      expiryMaxLength = 6 # 2 for month and 4 for year
-
-      if expiry.match /\//
-        expiry = expiry.replace("/", "")
-
-      if !expiry.match /^[0-9]*$/
-        return "••/••"
-
-      while expiry.length < 4
-        expiry += "•"
-
-      expiry = expiry.slice(0, 2) + "/" + expiry.slice(2, expiryMaxLength)
-
-      return expiry
-
-  cvc:->
-    if @props.cvc is null
-      return "•••"
-    else
-      return if @props.cvc.toString().length <= 4 then @props.cvc else @props.cvc.toString().slice(0, 4)
-
-
-exp = module.exports
-exp.prefix = "react-credit-card"
