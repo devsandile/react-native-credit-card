@@ -34,6 +34,7 @@ card.propTypes = {
   expiry: React.PropTypes.object.isRequired,
   expiryAfter: React.PropTypes.object.isRequired,
   expiryBefore: React.PropTypes.object.isRequired,
+  isAmex: React.PropTypes.bool,
   isFlipped: React.PropTypes.bool,
   isFocused: React.PropTypes.bool,
   name: React.PropTypes.string.isRequired,
@@ -47,9 +48,10 @@ card.defaultProps = {
   expiryAfter: 'valid thru',
   expiryBefore: 'month/year',
   focused: null,
+  isAmex: false,
   isFlipped: false,
   isFocused: false,
-  name: '',
+  name: 'FULL NAME',
   number: null,
   type: null,
 }
@@ -92,11 +94,6 @@ const styles = StyleSheet.create({
 const validate = Payment.fns
 
 /**
- * @todo figure out why this was set onRender()
- */
-let isAmex = this.state.type && this.state.type.name === 'amex'
-
-/**
  * @function cvc
  * Begin converted CoffeeScript functions
  * @param name
@@ -117,10 +114,14 @@ function expiry() {
   if (this.props.expiry === "") {
     return "••/••"
   } else {
-
     let expiry = this.props.expiry.toString()
 
-    let expiryMaxLength = 6 // 2 for month and 4 for year
+    /**
+     * @const expiryMaxLength
+     * @description Maximum expiration date length is set to six digits, caluclated by taking max 2 digits for month, and adding up to max 4 digits for year, giving us 6
+     * @type {number}
+     */
+    let expiryMaxLength = 6 //
 
     if (expiry.match(/\//)) {
       expiry = expiry.replace("/", "")
@@ -165,6 +166,16 @@ function name() {
  * @returns {*}
  */
 function number() {
+  var
+    _i,
+    amountOfSpaces,
+    i,
+    maxLength,
+    space_index,
+    space_index1,
+    space_index2,
+    string;
+
   if (!this.props.number) {
     var string = ""
   } else {
@@ -173,12 +184,12 @@ function number() {
   }
 
   if (string.length > maxLength) {
-    var string = string.slice(0,maxLength)
+    var string = string.slice(0, maxLength)
   } while (string.length < maxLength) {
     string += "•"
   }
 
-  if (this.state.type.name === "amex") {
+  if (props.isAmex === true) {
     var string
     let space_index1 = 4
     let space_index2 = 10
@@ -198,12 +209,11 @@ function number() {
 }
 
 /**
- * @function updateTypes
+ * @function updateType
  * @param props
  * @returns {*|void}
  */
 function updateType(props) {
-  let type
   if (!props.number) {
     return this.setState({
       type: {
@@ -213,14 +223,14 @@ function updateType(props) {
   }
 
   if (type = validate.cardType(props.number)) {
-    if (type === "amex") {
-      return this.setState({
+    if (props.isAmex === true) {
+      this.setState({
         type: {
           name: type, length: 15
         }
       })
     } else {
-      return this.setState({
+      this.setState({
         type: {
           name: type, length: 16
         }
@@ -243,7 +253,6 @@ function updateType(props) {
 class card extends Component {
   constructor(props) {
     super(props)
-
     this.state = {
       type: {
         length: 16,
