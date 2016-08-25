@@ -29,6 +29,8 @@
     "react-native": "0.30.0"
   },
   "dependencies": {
-    "payment": "^2.0.3"
+    "payment": "^2.0.3",
+    "react-native-flip-card": "^3.3.0",
+    "react-native-gifted-form": "0.0.13"
   }
 }

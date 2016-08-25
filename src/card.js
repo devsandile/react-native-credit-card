@@ -1,24 +1,29 @@
 /**
  * @export Card
  * @description Renders react-native flavor of @jesspollak interactive credit card component
+ * @implements FlipCard node module for flipping the card over onFocus of cvc (unless amex as cvc is on front)
+ * @see https://github.com/moschan/react-native-flip-card
  * @implements Payment node module for validating forms and formatting numbers
+ * @see https://github.com/jessepollak/payment
  * @see https://github.com/descomplica/react-credit-card
  * @see https://github.com/jessepollak/card
- * @see https://github.com/jessepollak/payment
  * @todo comparamentalize into smart/dumb component(s)/container(s)
  */
-import Payment from 'payment'
 import React, {
   Component,
   PropTypes,
 } from 'react'
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native'
+import FlipCard from 'react-native-flip-card'
+import { GiftedForm } from 'react-native-gifted-form'
+import Payment from 'payment'
 
 /**
  * @const cardBackgroundImages
@@ -42,157 +47,6 @@ const cardBackgroundImages = {
 const validate = Payment.fns
 
 /**
- * @function cvc
- * Begin converted CoffeeScript functions
- * @param name
- */
-function cvc() {
-  if (this.props.cvc === null) {
-    return "•••"
-  } else {
-    return this.props.cvc.toString().length <= 4 ? this.props.cvc : this.props.cvc.toString().slice(0, 4)
-  }
-}
-
-/**
- * @function expiry
- * @returns {*}
- */
-function expiry() {
-  if (this.props.expiry === "") {
-    return "••/••"
-  } else {
-    let expiry = this.props.expiry.toString()
-
-    /**
-     * @const expiryMaxLength
-     * @description Maximum expiration date length is set to six digits, caluclated by taking max 2 digits for month, and adding up to max 4 digits for year, giving us 6
-     * @type {number}
-     */
-    let expiryMaxLength = 6 //
-
-    if (expiry.match(/\//)) {
-      expiry = expiry.replace("/", "")
-    }
-
-    if (!expiry.match(/^[0-9]*$/)) {
-      return "••/••"
-    }
-
-    while (expiry.length < 4) {
-      expiry += "•"
-    }
-
-    expiry = expiry.slice(0, 2) + "/" + expiry.slice(2, expiryMaxLength)
-
-    return expiry
-  }
-}
-
-/**
- * @function getValue
- * @param name
- */
-function getValue(name) {
-  this[name]()
-}
-
-/**
- * @function name
- * @returns {*}
- */
-function name() {
-  if (this.props.name === "") {
-    return "FULL NAME"
-  } else {
-    return this.props.name
-  }
-}
-
-/**
- * @function number
- * @returns {*}
- */
-function number() {
-  var amountOfSpaces,
-    i,
-    maxLength,
-    space_index,
-    space_index1,
-    space_index2,
-    string;
-
-  if (!this.props.number) {
-    var string = ""
-  } else {
-    var string = this.props.number.toString()
-    var maxLength = this.state.type.length
-  }
-
-  if (string.length > maxLength) {
-    var string = string.slice(0, maxLength)
-  } while (string.length < maxLength) {
-    string += "•"
-  }
-
-  if (props.isAmex === true) {
-    var string
-    let space_index1 = 4
-    let space_index2 = 10
-
-    return string = string.substring(0, space_index1) + " " + string.substring(space_index1, space_index2) + " " + string.substring(space_index2)
-  } else {
-    let amountOfSpaces
-    return amountOfSpaces = Math.ceil(maxLength/4)
-
-    let iterable = __range__(1, amountOfSpaces, false)
-    for (let j = 0; j < iterable.length; j++) {
-      let i = iterable[j]
-      let space_index = ((i*4) + (i - 1))
-      var string = string.slice(0, space_index) + " " + string.slice(space_index)
-    }
-  }
-}
-
-/**
- * @function updateType
- * @param props
- * @returns {*|void}
- */
-function updateType(props) {
-  if (!props.number) {
-    return this.setState({
-      type: {
-        name: "unknown", length: 16
-      }
-    })
-  }
-
-  if (type = validate.cardType(props.number)) {
-    if (props.isAmex === true) {
-      this.setState({
-        type: {
-          name: type, length: 15
-        }
-      })
-    } else {
-      this.setState({
-        type: {
-          name: type, length: 16
-        }
-      })
-    }
-  }
-
-  return this.setState({
-    type: {
-      length: 16,
-      name: 'unknown',
-    }
-  })
-}
-
-/**
  * @class Card
  * @classdesc render react-native credit card visual component
  */
@@ -200,77 +54,154 @@ class Card extends Component {
   constructor(props, defaultProps) {
     super(props, defaultProps)
     this.state = {
-      type: {
-        length: 16,
-        name: 'unknown',
-      }
+      cardForm: {
+        deviceId: 2,
+        deviceType: Platform.OS,
+      },
+      cvc: '•••',
+      expiry: '••/••',
+      name: 'YOUR NAME',
+      number: '•••• •••• •••• ••••',
     }
   }
 
+  /**
+   * @method focusNextField
+   * @param nextField
+   * @description focuses on the next text input field onSubmitEditing
+   * @note borrowed from ~/routes/auth/signup/components/signup.js
+   * @todo scope into standalone module with handleValueChanged
+   */
+  focusNextField(nextField) {
+    this.refs[nextField].focus()
+  }
+
+  //
+  /**
+   * @method handleValueChanged
+   * @param values
+   * @description onChange form object builder
+   * @note borrowed from ~/routes/auth/signup/components/signup.js
+   * @todo scope into standalone module with focusNextField
+   */
+  handleValueChange(values) {
+    this.setState({ cardForm: values })
+  }
+
   componentWillMount(props) {
-    // return this.updateType(props)
+    // Set all the things we want rendered on FIRST load
   }
 
   componentWillReceiveProps(nextProps) {
-    // return this.updateType(nextProps)
+    // Compare incoming props to current props or state, and deciding what to render based on that comparison
+  }
+
+  focusNextField(nextField) {
+    this.refs[nextField].focus();
   }
 
   render() {
+
+    /**
+     * @const
+     * @description two-way data binding text input values to this.state.form
+     * @note borrowed from ~/routes/auth/signup/components/signup.js
+     */
+    const {
+      cvc,
+      expiry,
+      name,
+      number,
+    } = this.state.cardForm
+
     return (
       <View style={styles.container}>
-        <View style={styles.cardContainer}>
+        <FlipCard
+          clickable={true}
+          flip={false}
+          flipHorizontal={true}
+          flipVertical={false}
+          friction={6}
+          onFlipped={(isFlipped)=>{console.log('isFlipped', isFlipped)}}
+          perspective={1000}
+          style={styles.cardContainer}
+        >
           <View style={styles.cardFront}>
             <Image
               style={styles.float__cardChip}
             />
             <Image
               source={{uri: cardBackgroundImages.visa}}
-              style={[styles.float__cardImageLogo, styles.isPrimary]}
+              style={styles.float__cardImageLogo}
             />
-            <Text style={[styles.float__number, styles.isPlaceHolder]}>••••  ••••  ••••  ••••</Text>
-            <Text style={[styles.float__number, styles.isPrimary]}>{this.props.number}</Text>
-
-            <Text style={[styles.float__name, styles.isPlaceHolder]}>YOUR  NAME</Text>
-            <Text style={[styles.float__name, styles.isPrimary]}>{this.props.name}</Text>
-
-            <Text style={[styles.float__expiry, styles.isPlaceHolder]}>••/••</Text>
-              <Text style={[styles.float__expiry, styles.isPrimary]}>{this.props.expiry}</Text>
+            <Text style={styles.float__number}>{this.state.number.split(' ').map((number) => number).join(' ')}</Text>
+            <Text style={styles.float__name}>{this.state.name.split(' ').map((name) => name).join(' ')}</Text>
+            <Text style={styles.float__expiry}>{this.state.expiry.split(' ').map((expiry) => expiry).join(' ')}</Text>
           </View>
-        </View>
-        <View style={styles.cardBack}>
-          <Text style={styles.float__cvc}>{this.props.cvc}</Text>
-        </View>
-        <View style={styles.textInputContainer}>
-          <View style={styles.textInputBorder}>
-            <TextInput
-              defaultValue={this.props.name}
-              placeholder={this.props.name}
-              style={styles.textInputFull}
-            />
+          <View style={styles.cardBack}>
+            <View style={styles.barAbove} />
+            <View style={styles.barBelow} />
+            <Text style={styles.float__cvc}>{this.state.cvc.split(' ').map((cvc) => cvc).join(' ')}</Text>
           </View>
-          <View style={styles.textInputBorder}>
-            <TextInput
+        </FlipCard>
+        <View style={styles.formContainer}>
+          <GiftedForm
+            clearOnClose={true}
+            formName='cardForm'
+            onValueChange={this.handleValueChange.bind(this)}
+            scrollEnabled={false}
+            style={{ backgroundColor: 'transparent' }}
+          >
+            <GiftedForm.TextInputWidget
+              autoCorrect={false}
+              clearButtonMode='while-editing'
+              clearTextOnFocus={true}
               defaultValue={this.props.number}
-              placeholder={this.props.number}
+              keyboardType='numeric'
+              name='number'
+              onChangeText={(number) => this.setState({number})}
+              onSubmitEditing={() => this.focusNextField('2')}
+              placeholder={this.props.number.toString()}
+              ref='1'
+              returnKeyType='next'
               style={styles.textInputFull}
+              value={number}
             />
-          </View>
-          <View style={styles.row}>
-            <View style={styles.textInputBorder}>
-              <TextInput
+            <GiftedForm.TextInputWidget
+              clearTextOnFocus={true}
+              defaultValue={this.props.name}
+              keyboardType='default'
+              onChangeText={(name) => this.setState({name})}
+              onSubmitEditing={() => this.focusNextField('3')}
+              placeholder={this.props.name.toString()}
+              ref='2'
+              style={styles.textInputFull}
+              value={name}
+            />
+            <View style={styles.row}>
+              <GiftedForm.TextInputWidget
+                clearTextOnFocus={true}
                 defaultValue={this.props.expiry}
+                keyboardType='numeric'
+                onChangeText={(expiry) => this.setState({expiry})}
+                onSubmitEditing={() => this.focusNextField('4')}
                 placeholder={this.props.expiry}
+                ref='3'
                 style={styles.textInputHalf}
+                value={expiry}
               />
-            </View>
-            <View style={styles.textInputBorder}>
-              <TextInput
+              <GiftedForm.TextInputWidget
+                clearTextOnFocus={true}
                 defaultValue={this.props.cvc}
+                keyboardType='numeric'
+                onChangeText={(cvc) => this.setState({cvc})}
                 placeholder={this.props.cvc}
+                ref='4'
                 style={styles.textInputHalf}
+                value={cvc}
               />
             </View>
-          </View>
+          </GiftedForm>
         </View>
       </View>
     )
@@ -331,52 +262,78 @@ const styles = StyleSheet.create({
   __visa: {
     backgroundColor: '#191278',
   },
-  cardBack: {
-    opacity: 0,
+
+  barAbove: {
+    backgroundColor: 'black',
+    height: 25,
+    left: -30,
+    position: 'absolute',
+    top: 0,
+    width: 280,
   },
+  barBelow: {
+    backgroundColor: 'white',
+    height: 25,
+    left: -15,
+    position: 'absolute',
+    top: 45,
+    width: 200,
+  },
+
   cardContainer: {
     alignSelf: 'stretch',
-    backgroundColor: '#9EC3D7',
+    backgroundColor: 'rgba(248, 250, 250, 0.96)',
     borderRadius: 6,
+    borderWidth: 0,
     flex: 1,
     height: 175,
     paddingLeft: 30,
     paddingRight: 30,
     paddingTop: 15,
+    shadowColor: '#000000',
+    shadowOffset: {
+      height: 3,
+      width: 3,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 2.5,
     width: 280,
   },
-  cardFront: {},
+
+  cardBack: {
+    flex: 1,
+  },
+  cardFront: {
+    flex: 1,
+  },
+
   container: {
     alignSelf: 'stretch',
     alignItems: 'flex-end',
     flex: 1,
     justifyContent: 'space-between',
   },
-  textInputBorder: {
-    backgroundColor: 'transparent',
-    borderBottomWidth: 1,
-    borderColor: 'grey',
+
+  formContainer: {
+    alignSelf: 'stretch',
+    marginBottom: 20,
+    marginTop: 20,
   },
-  textInputContainer: {
-    marginBottom: 40,
-  },
+
   textInputFull: {
+    backgroundColor: 'transparent',
     color: '#7B797C',
     flex: 1,
     fontSize: 16,
-    marginTop: 26,
-    paddingBottom: 14,
-    paddingTop: 22,
     width: 280,
   },
   textInputHalf: {
+    backgroundColor: 'transparent',
     color: '#7B797C',
     fontSize: 16,
-    marginTop: 26,
-    paddingBottom: 14,
-    paddingTop: 22,
     width: 126,
   },
+
   float__cardChip: {
     backgroundColor: '#CCC',
     borderRadius: 5,
@@ -396,6 +353,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   float__number: {
+    color: '#6C6C6C',
     fontSize: 18,
     fontWeight: '700',
     flexWrap: 'nowrap',
@@ -405,6 +363,7 @@ const styles = StyleSheet.create({
     top: 75.5,
   },
   float__name: {
+    color: '#6C6C6C',
     fontSize: 15,
     fontWeight: '600',
     left: 0,
@@ -413,6 +372,7 @@ const styles = StyleSheet.create({
     top: 110,
   },
   float__expiry: {
+    color: '#6C6C6C',
     fontSize: 13,
     fontWeight: '400',
     letterSpacing: 0.35,
@@ -421,21 +381,18 @@ const styles = StyleSheet.create({
     top: 111.5,
   },
   float__cvc: {
+    color: '#6C6C6C',
     fontSize: 13,
     position: 'absolute',
     right: 0,
-    top: 110,
+    top: 47.5,
   },
-  isPlaceHolder: {
-    color: 'white',
-    opacity: 1,
-  },
-  isPrimary: {
-    opacity: 0,
-  },
+
   row: {
     alignSelf: 'stretch',
+    backgroundColor: 'transparent',
+    borderWidth: 0,
     flexDirection: 'row',
-    justifyContent: 'space-between',
   },
 })
+
